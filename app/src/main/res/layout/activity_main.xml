@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="#FFFFFFFF"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="org.molaei.stepseekbarexample.MainActivity">
+
+    <org.molaei.stepseekbar.StepSeekbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:progress="10"
+        app:max="100"
+        app:steps="10,20,50,75"
+        app:progressColor="@color/colorPrimary"
+        app:thumbColor="@color/colorPrimary"
+        app:stepsColor="#FFF"
+        app:textPosition="top" />
+
+</LinearLayout>
