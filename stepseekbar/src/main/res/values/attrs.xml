@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StepSeekbar">
+        <attr name="steps" format="string" />
+        <attr name="max" format="integer" />
+        <attr name="progress" format="integer" />
+        <attr name="stepsDrawable" format="reference" />
+        <attr name="stepsColor" format="color" />
+        <attr name="thumbDrawable" format="reference" />
+        <attr name="thumbColor" format="color" />
+        <attr name="progressColor" format="color" />
+        <attr name="backgroundColor" format="color" />
+        <attr name="textPosition" format="enum">
+            <enum name="top" value="0" />
+            <enum name="bottom" value="1" />
+            <enum name="both" value="2" />
+        </attr>
+        <attr name="textTypeface" format="reference"/>
+    </declare-styleable>
+</resources>
