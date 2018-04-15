@@ -16,13 +16,13 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Created by ali on 4/14/18.
@@ -40,7 +40,7 @@ public class StepSeekbar extends FrameLayout {
     private int stepHeight;
     private View thumbView;
     private boolean topText, bottomText;
-    private Drawable thumbDrawable,stepsDrawable;
+    private Drawable thumbDrawable, stepsDrawable;
     private Typeface textTypeface;
 
     public StepSeekbar(Context context, AttributeSet attrs) {
@@ -74,8 +74,8 @@ public class StepSeekbar extends FrameLayout {
         thumbColor = typedArray.getColor(R.styleable.StepSeekbar_thumbColor, Color.parseColor("#FF0000"));
         int progressColor = typedArray.getColor(R.styleable.StepSeekbar_progressColor, Color.parseColor("#FF0000"));
         int backgroundColor = typedArray.getColor(R.styleable.StepSeekbar_backgroundColor, Color.parseColor("#FFFFFF"));
-        final int stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
-        final int stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
+        stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
+        stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
 
         int textPosition = typedArray.getInt(R.styleable.StepSeekbar_textPosition, 0);
         topText = textPosition == 0 || textPosition == 2;
@@ -96,47 +96,40 @@ public class StepSeekbar extends FrameLayout {
 
         stringSteps = typedArray.getString(R.styleable.StepSeekbar_steps);
 
-        seekBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        if (stringSteps != null) {
+            String[] stringStepsArray = stringSteps.split(",");
+            steps = new MyStep[stringStepsArray.length + 2];
+            steps[0] = new MyStep(0, stepWidth, stepHeight);
+            for (int i = 0; i < stringStepsArray.length; i++) {
+                steps[i + 1] = new MyStep(Integer.valueOf(stringStepsArray[i]), stepWidth, stepHeight);
+            }
+            steps[stringStepsArray.length + 1] = new MyStep(max, stepWidth, stepHeight);
+        }
+
+        for (MyStep myStep : steps) {
+            addView(myStep.seekBar);
+        }
+
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onGlobalLayout() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBar.setThumb(getThumb(String.valueOf(progress), topText, bottomText));
+                seekBar.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+            }
 
-                if (stringSteps != null) {
-                    String[] stringStepsArray = stringSteps.split(",");
-                    steps = new MyStep[stringStepsArray.length + 2];
-                    steps[0] = new MyStep(0, stepWidth, stepHeight);
-                    for (int i = 0; i < stringStepsArray.length; i++) {
-                        steps[i + 1] = new MyStep(Integer.valueOf(stringStepsArray[i]), stepWidth, stepHeight);
-                    }
-                    steps[stringStepsArray.length + 1] = new MyStep(max, stepWidth, stepHeight);
-                }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                for (MyStep myStep : steps) {
-                    addView(myStep.seekBar);
-                }
+            }
 
-
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        seekBar.setThumb(getThumb(String.valueOf(progress), topText, bottomText));
-                        seekBar.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-                        stepper(seekBar);
-                    }
-                });
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
                 stepper(seekBar);
-
-                seekBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+        stepper(seekBar);
+
         typedArray.recycle();
     }
 
@@ -196,6 +189,7 @@ public class StepSeekbar extends FrameLayout {
         MyStep(int value, int stepWidth, int stepHeight) {
             this.value = value;
             seekBar = new AppCompatSeekBar(getContext());
+            seekBar.setMax(max);
             seekBar.setProgress(value);
             seekBar.setProgressDrawable(ContextCompat.getDrawable(getContext(), R.drawable.steps_seekbar_drawable));
             Bitmap b = drawableToBitmap(stepsDrawable);
@@ -225,5 +219,21 @@ public class StepSeekbar extends FrameLayout {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public int getMax() {
+        return seekBar.getMax();
+    }
+
+    public void setMax(int max) {
+        seekBar.setMax(max);
+    }
+
+    public int getProgress() {
+        return seekBar.getProgress();
+    }
+
+    public void setProgress(int progress) {
+        seekBar.setProgress(progress);
     }
 }

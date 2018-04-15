@@ -18,5 +18,7 @@
         <attr name="textTypeface" format="reference"/>
         <attr name="stepWidth" format="dimension"/>
         <attr name="stepHeight" format="dimension"/>
+        <attr name="textBeforeProgress" format="string"/>
+        <attr name="textAfterProgress" format="string"/>
     </declare-styleable>
 </resources>
