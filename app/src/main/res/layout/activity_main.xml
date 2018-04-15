@@ -17,6 +17,8 @@
         app:progressColor="@color/colorPrimary"
         app:thumbColor="@color/colorPrimary"
         app:stepsColor="#FFF"
+        app:stepHeight="25dp"
+        app:stepWidth="10dp"
         app:textPosition="top" />
 
 </LinearLayout>

@@ -36,6 +36,8 @@ public class StepSeekbar extends FrameLayout {
     private int progress;
     private int stepsColor;
     private int thumbColor;
+    private int stepWidth;
+    private int stepHeight;
     private View thumbView;
     private boolean topText, bottomText;
     private Drawable thumbDrawable,stepsDrawable;
@@ -72,6 +74,8 @@ public class StepSeekbar extends FrameLayout {
         thumbColor = typedArray.getColor(R.styleable.StepSeekbar_thumbColor, Color.parseColor("#FF0000"));
         int progressColor = typedArray.getColor(R.styleable.StepSeekbar_progressColor, Color.parseColor("#FF0000"));
         int backgroundColor = typedArray.getColor(R.styleable.StepSeekbar_backgroundColor, Color.parseColor("#FFFFFF"));
+        final int stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
+        final int stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
 
         int textPosition = typedArray.getInt(R.styleable.StepSeekbar_textPosition, 0);
         topText = textPosition == 0 || textPosition == 2;
@@ -95,8 +99,6 @@ public class StepSeekbar extends FrameLayout {
         seekBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                int stepWidth = seekBar.getMeasuredHeight() / 4;
-                int stepHeight = seekBar.getMeasuredHeight();
 
                 if (stringSteps != null) {
                     String[] stringStepsArray = stringSteps.split(",");
