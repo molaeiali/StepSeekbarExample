@@ -16,8 +16,7 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -28,20 +27,21 @@ import java.util.Locale;
  * Created by ali on 4/14/18.
  */
 
-public class StepSeekbar extends FrameLayout {
+public class StepSeekbar extends RelativeLayout {
     private MyStep[] steps;
-    private AppCompatSeekBar seekBar;
-    private String stringSteps;
+    private SeekBar seekBar;
+    private SeekBar seekBarTextTop;
+    private SeekBar seekBarTextBottom;
     private int max;
     private int progress;
     private int stepsColor;
     private int thumbColor;
-    private int stepWidth;
-    private int stepHeight;
-    private View thumbView;
-    private boolean topText, bottomText;
-    private Drawable thumbDrawable, stepsDrawable;
+    private View textSeekBarThumbView;
+    private Drawable stepsDrawable;
     private Typeface textTypeface;
+    private String textBeforeProgress;
+    private String textAfterProgress;
+    private StepSeekbarOnScrollChangedListener stepSeekbarOnScrollChangedListener;
 
     public StepSeekbar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,12 +49,14 @@ public class StepSeekbar extends FrameLayout {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         //noinspection ConstantConditions
-        final View view = inflater.inflate(R.layout.stepseekbar, this, true);
-        seekBar = view.findViewById(R.id.seekbar);
+        final RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.stepseekbar, this, true);
+        seekBar = layout.findViewById(R.id.seekbar);
+        seekBarTextTop = layout.findViewById(R.id.seekbarTextTop);
+        seekBarTextBottom = layout.findViewById(R.id.seekbarTextBottom);
 
-        thumbView = LayoutInflater.from(getContext()).inflate(R.layout.stepseekbar_thumb, null, false);
+        textSeekBarThumbView = LayoutInflater.from(getContext()).inflate(R.layout.stepseekbar_text_thumb, null, false);
 
-        thumbDrawable = typedArray.getDrawable(R.styleable.StepSeekbar_thumbDrawable);
+        Drawable thumbDrawable = typedArray.getDrawable(R.styleable.StepSeekbar_thumbDrawable);
         if (thumbDrawable == null) {
             thumbDrawable = ContextCompat.getDrawable(getContext(), R.drawable.thumb);
         }
@@ -74,27 +76,52 @@ public class StepSeekbar extends FrameLayout {
         thumbColor = typedArray.getColor(R.styleable.StepSeekbar_thumbColor, Color.parseColor("#FF0000"));
         int progressColor = typedArray.getColor(R.styleable.StepSeekbar_progressColor, Color.parseColor("#FF0000"));
         int backgroundColor = typedArray.getColor(R.styleable.StepSeekbar_backgroundColor, Color.parseColor("#FFFFFF"));
-        stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
-        stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
+        int stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
+        int stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
+
+        textBeforeProgress = typedArray.getString(R.styleable.StepSeekbar_textBeforeProgress);
+        textAfterProgress = typedArray.getString(R.styleable.StepSeekbar_textAfterProgress);
+
+        if (textBeforeProgress == null)
+            textBeforeProgress = "";
+
+        if (textAfterProgress == null)
+            textAfterProgress = "";
 
         int textPosition = typedArray.getInt(R.styleable.StepSeekbar_textPosition, 0);
-        topText = textPosition == 0 || textPosition == 2;
-        bottomText = textPosition == 1 || textPosition == 2;
+        boolean topText = textPosition == 0 || textPosition == 2;
+        boolean bottomText = textPosition == 1 || textPosition == 2;
+
+        seekBarTextTop.setVisibility(topText ? VISIBLE : GONE);
+        seekBarTextBottom.setVisibility(bottomText ? VISIBLE : GONE);
 
         seekBar.setBackgroundColor(backgroundColor);
 
-        seekBar.setThumb(getThumb(String.valueOf(progress), topText, bottomText));
+
         seekBar.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+        seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+        seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
 
         seekBar.getProgressDrawable().setColorFilter(progressColor, PorterDuff.Mode.MULTIPLY);
 
         max = typedArray.getInt(R.styleable.StepSeekbar_max, 100);
         seekBar.setMax(max);
+        seekBarTextTop.setMax(max);
+        seekBarTextBottom.setMax(max);
+
+        seekBarTextTop.setEnabled(false);
+        seekBarTextBottom.setEnabled(false);
 
         progress = typedArray.getInt(R.styleable.StepSeekbar_progress, 0);
         seekBar.setProgress(progress);
+        seekBarTextTop.setProgress(progress);
+        seekBarTextBottom.setProgress(progress);
 
-        stringSteps = typedArray.getString(R.styleable.StepSeekbar_steps);
+        seekBar.setThumb(thumbDrawable);
+        seekBarTextTop.setThumb(getTextsThumb(String.valueOf(progress)));
+        seekBarTextBottom.setThumb(getTextsThumb(String.valueOf(progress)));
+
+        String stringSteps = typedArray.getString(R.styleable.StepSeekbar_steps);
 
         if (stringSteps != null) {
             String[] stringStepsArray = stringSteps.split(",");
@@ -107,24 +134,33 @@ public class StepSeekbar extends FrameLayout {
         }
 
         for (MyStep myStep : steps) {
-            addView(myStep.seekBar);
+            ((RelativeLayout) layout.getChildAt(0)).addView(myStep.seekBar);
         }
 
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                seekBar.setThumb(getThumb(String.valueOf(progress), topText, bottomText));
-                seekBar.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+                if (stepSeekbarOnScrollChangedListener != null)
+                    stepSeekbarOnScrollChangedListener.onProgressChanged(seekBar, progress, fromUser);
+                seekBarTextTop.setProgress(progress);
+                seekBarTextTop.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
+                seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+                seekBarTextBottom.setProgress(progress);
+                seekBarTextBottom.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
+                seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                if (stepSeekbarOnScrollChangedListener != null)
+                    stepSeekbarOnScrollChangedListener.onStartTrackingTouch(seekBar);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (stepSeekbarOnScrollChangedListener != null)
+                    stepSeekbarOnScrollChangedListener.onStopTrackingTouch(seekBar);
                 stepper(seekBar);
             }
         });
@@ -133,27 +169,17 @@ public class StepSeekbar extends FrameLayout {
         typedArray.recycle();
     }
 
-    public Drawable getThumb(String string, boolean top, boolean bottom) {
-        TextView topTv = thumbView.findViewById(R.id.seekbarTextTop);
-        TextView bottomTv = thumbView.findViewById(R.id.seekbarTextBottom);
+    public Drawable getTextsThumb(String string) {
+        TextView text = textSeekBarThumbView.findViewById(R.id.text);
 
-        ImageView thumb = thumbView.findViewById(R.id.seekbarThumb);
-        thumb.setImageDrawable(thumbDrawable);
+        text.setText(string);
+        text.setTypeface(textTypeface);
 
-        topTv.setText(string);
-        bottomTv.setText(string);
-
-        topTv.setTypeface(textTypeface);
-        bottomTv.setTypeface(textTypeface);
-
-        topTv.setVisibility(top ? VISIBLE : INVISIBLE);
-        bottomTv.setVisibility(bottom ? VISIBLE : INVISIBLE);
-
-        thumbView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        Bitmap bitmap = Bitmap.createBitmap(thumbView.getMeasuredWidth(), thumbView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        textSeekBarThumbView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        Bitmap bitmap = Bitmap.createBitmap(textSeekBarThumbView.getMeasuredWidth(), textSeekBarThumbView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        thumbView.layout(0, 0, thumbView.getMeasuredWidth(), thumbView.getMeasuredHeight());
-        thumbView.draw(canvas);
+        textSeekBarThumbView.layout(0, 0, textSeekBarThumbView.getMeasuredWidth(), textSeekBarThumbView.getMeasuredHeight());
+        textSeekBarThumbView.draw(canvas);
 
         return new BitmapDrawable(getResources(), bitmap);
     }
@@ -191,6 +217,9 @@ public class StepSeekbar extends FrameLayout {
             seekBar = new AppCompatSeekBar(getContext());
             seekBar.setMax(max);
             seekBar.setProgress(value);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            layoutParams.addRule(RelativeLayout.BELOW, R.id.seekbarTextTop);
+            seekBar.setLayoutParams(layoutParams);
             seekBar.setProgressDrawable(ContextCompat.getDrawable(getContext(), R.drawable.steps_seekbar_drawable));
             Bitmap b = drawableToBitmap(stepsDrawable);
             Bitmap bitmapResized = Bitmap.createScaledBitmap(b, stepWidth, stepHeight, false);
@@ -235,5 +264,17 @@ public class StepSeekbar extends FrameLayout {
 
     public void setProgress(int progress) {
         seekBar.setProgress(progress);
+    }
+
+    public void setTextAfterProgress(String textAfterProgress) {
+        this.textAfterProgress = textAfterProgress;
+    }
+
+    public void setTextBeforeProgress(String textBeforeProgress) {
+        this.textBeforeProgress = textBeforeProgress;
+    }
+
+    public void setStepSeekbarOnScrollChangedListener(StepSeekbarOnScrollChangedListener stepSeekbarOnScrollChangedListener) {
+        this.stepSeekbarOnScrollChangedListener = stepSeekbarOnScrollChangedListener;
     }
 }
