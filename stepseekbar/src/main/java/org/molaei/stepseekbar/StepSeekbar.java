@@ -297,5 +297,7 @@ public class StepSeekbar extends RelativeLayout {
 
     public void setTextSize(float textSizeInSp){
         this.textSize = dpToPx(textSizeInSp);
+        seekBar.setProgress(seekBar.getProgress()-1);
+        seekBar.setProgress(seekBar.getProgress()+1);
     }
 }
