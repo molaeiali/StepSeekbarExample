@@ -45,10 +45,13 @@ public class StepSeekbar extends RelativeLayout {
     private String textBeforeProgress;
     private String textAfterProgress;
     private StepSeekbarOnScrollChangedListener stepSeekbarOnScrollChangedListener;
+    private boolean firstLaunch;
 
     public StepSeekbar(Context context, AttributeSet attrs) {
         super(context, attrs);
         final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.StepSeekbar, 0, 0);
+
+        firstLaunch = true;
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         //noinspection ConstantConditions
@@ -295,9 +298,12 @@ public class StepSeekbar extends RelativeLayout {
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-    public void setTextSize(float textSizeInSp){
+    public void setTextSize(float textSizeInSp) {
         this.textSize = dpToPx(textSizeInSp);
-        seekBar.setProgress(seekBar.getProgress()-1);
-        seekBar.setProgress(seekBar.getProgress()+1);
+        if (firstLaunch) {
+            seekBar.setProgress(seekBar.getProgress() - 1);
+            seekBar.setProgress(seekBar.getProgress() + 1);
+            firstLaunch = false;
+        }
     }
 }
