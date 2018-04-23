@@ -295,7 +295,7 @@ public class StepSeekbar extends RelativeLayout {
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-    private void setTextSize(float textSizeInSp){
+    public void setTextSize(float textSizeInSp){
         this.textSize = dpToPx(textSizeInSp);
     }
 }
