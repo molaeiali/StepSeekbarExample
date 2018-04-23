@@ -16,7 +16,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -30,15 +29,15 @@ import java.util.Locale;
  * Created by ali on 4/14/18.
  */
 
+@SuppressWarnings("unused")
 public class StepSeekbar extends RelativeLayout {
     private MyStep[] steps;
     private SeekBar seekBar;
     private SeekBar seekBarTextTop;
     private SeekBar seekBarTextBottom;
     private int max;
-    private int progress;
     private int stepsColor;
-    private int textSize;
+    private float textSize;
     private int thumbColor;
     private View textSeekBarThumbView;
     private Drawable stepsDrawable;
@@ -118,7 +117,7 @@ public class StepSeekbar extends RelativeLayout {
         seekBarTextTop.setEnabled(false);
         seekBarTextBottom.setEnabled(false);
 
-        progress = typedArray.getInt(R.styleable.StepSeekbar_progress, 0);
+        int progress = typedArray.getInt(R.styleable.StepSeekbar_progress, 0);
         seekBar.setProgress(progress);
         seekBarTextTop.setProgress(progress);
         seekBarTextBottom.setProgress(progress);
@@ -285,9 +284,18 @@ public class StepSeekbar extends RelativeLayout {
         this.stepSeekbarOnScrollChangedListener = stepSeekbarOnScrollChangedListener;
     }
 
-    private float pxToDp(int px) {
+    private float pxToDp(float px) {
         Resources resources = getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         return px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    private float dpToPx(float dp) {
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
+
+    private void setTextSize(float textSizeInSp){
+        this.textSize = dpToPx(textSizeInSp);
     }
 }
