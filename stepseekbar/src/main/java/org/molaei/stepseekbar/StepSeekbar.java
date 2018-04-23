@@ -1,6 +1,7 @@
 package org.molaei.stepseekbar;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -35,6 +38,7 @@ public class StepSeekbar extends RelativeLayout {
     private int max;
     private int progress;
     private int stepsColor;
+    private int textSize;
     private int thumbColor;
     private View textSeekBarThumbView;
     private Drawable stepsDrawable;
@@ -78,6 +82,8 @@ public class StepSeekbar extends RelativeLayout {
         int backgroundColor = typedArray.getColor(R.styleable.StepSeekbar_backgroundColor, Color.parseColor("#FFFFFF"));
         int stepWidth = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepWidth, 20);
         int stepHeight = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_stepHeight, 12);
+
+        textSize = typedArray.getDimensionPixelSize(R.styleable.StepSeekbar_textSize, 12);
 
         textBeforeProgress = typedArray.getString(R.styleable.StepSeekbar_textBeforeProgress);
         textAfterProgress = typedArray.getString(R.styleable.StepSeekbar_textAfterProgress);
@@ -174,6 +180,7 @@ public class StepSeekbar extends RelativeLayout {
 
         text.setText(string);
         text.setTypeface(textTypeface);
+        text.setTextSize(pxToDp(textSize));
 
         textSeekBarThumbView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         Bitmap bitmap = Bitmap.createBitmap(textSeekBarThumbView.getMeasuredWidth(), textSeekBarThumbView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
@@ -276,5 +283,11 @@ public class StepSeekbar extends RelativeLayout {
 
     public void setStepSeekbarOnScrollChangedListener(StepSeekbarOnScrollChangedListener stepSeekbarOnScrollChangedListener) {
         this.stepSeekbarOnScrollChangedListener = stepSeekbarOnScrollChangedListener;
+    }
+
+    private float pxToDp(int px) {
+        Resources resources = getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        return px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

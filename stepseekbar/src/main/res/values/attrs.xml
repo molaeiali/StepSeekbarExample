@@ -16,6 +16,7 @@
             <enum name="both" value="2" />
         </attr>
         <attr name="textTypeface" format="reference"/>
+        <attr name="textSize" format="dimension"/>
         <attr name="stepWidth" format="dimension"/>
         <attr name="stepHeight" format="dimension"/>
         <attr name="textBeforeProgress" format="string"/>

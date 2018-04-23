@@ -21,6 +21,7 @@
         app:thumbColor="@color/colorPrimary"
         app:stepsColor="#FFF"
         app:stepHeight="24dp"
+        app:textSize="12sp"
         app:stepWidth="10dp"
         app:textPosition="top" />
 
