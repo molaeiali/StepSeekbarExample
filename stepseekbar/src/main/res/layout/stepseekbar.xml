@@ -11,19 +11,25 @@
         android:progress="20"
         android:progressDrawable="@drawable/steps_seekbar_drawable" />
 
-    <SeekBar
-        android:id="@+id/seekbar"
-        android:layout_below="@+id/seekbarTextTop"
+    <RelativeLayout
+        android:id="@+id/seekbarWrapper"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:progress="20"
-        android:thumb="@drawable/thumb" />
+        android:layout_below="@+id/seekbarTextTop"
+        android:layout_height="wrap_content">
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="20"
+            android:thumb="@drawable/thumb" />
+
+    </RelativeLayout>
 
     <SeekBar
         android:id="@+id/seekbarTextBottom"
         android:layout_width="match_parent"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/seekbar"
+        android:layout_below="@+id/seekbarWrapper"
         android:layout_height="wrap_content"
         android:progress="20"
         android:progressDrawable="@drawable/steps_seekbar_drawable" />

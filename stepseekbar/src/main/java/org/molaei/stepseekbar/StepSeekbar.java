@@ -1,5 +1,6 @@
 package org.molaei.stepseekbar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -47,6 +48,7 @@ public class StepSeekbar extends RelativeLayout {
     private StepSeekbarOnScrollChangedListener stepSeekbarOnScrollChangedListener;
     private boolean firstLaunch;
 
+    @SuppressLint("InflateParams")
     public StepSeekbar(Context context, AttributeSet attrs) {
         super(context, attrs);
         final TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.StepSeekbar, 0, 0);
@@ -142,7 +144,8 @@ public class StepSeekbar extends RelativeLayout {
         }
 
         for (MyStep myStep : steps) {
-            ((RelativeLayout) layout.getChildAt(0)).addView(myStep.seekBar);
+            View view = layout.getChildAt(0).findViewById(R.id.seekbarWrapper);
+            ((RelativeLayout) view).addView(myStep.seekBar);
         }
 
 
@@ -228,7 +231,7 @@ public class StepSeekbar extends RelativeLayout {
             seekBar.setMax(max);
             seekBar.setProgress(value);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-            layoutParams.addRule(RelativeLayout.BELOW, R.id.seekbarTextTop);
+            layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
             seekBar.setLayoutParams(layoutParams);
             seekBar.setProgressDrawable(ContextCompat.getDrawable(getContext(), R.drawable.steps_seekbar_drawable));
             Bitmap b = drawableToBitmap(stepsDrawable);
