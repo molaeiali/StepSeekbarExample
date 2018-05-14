@@ -153,10 +153,10 @@ public class StepSeekbar extends RelativeLayout {
                     stepSeekbarOnScrollChangedListener.onProgressChanged(seekBar, progress, fromUser);
                 seekBarTextTop.setProgress(progress);
                 seekBarTextTop.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
-                seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+//                seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
                 seekBarTextBottom.setProgress(progress);
                 seekBarTextBottom.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
-                seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+//                seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
             }
 
             @Override
@@ -183,6 +183,7 @@ public class StepSeekbar extends RelativeLayout {
         text.setText(string);
         text.setTypeface(textTypeface);
         text.setTextSize(pxToDp(textSize));
+        text.setTextColor(thumbColor);
 
         textSeekBarThumbView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         Bitmap bitmap = Bitmap.createBitmap(textSeekBarThumbView.getMeasuredWidth(), textSeekBarThumbView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
