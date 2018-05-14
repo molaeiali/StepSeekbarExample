@@ -153,10 +153,10 @@ public class StepSeekbar extends RelativeLayout {
                     stepSeekbarOnScrollChangedListener.onProgressChanged(seekBar, progress, fromUser);
                 seekBarTextTop.setProgress(progress);
                 seekBarTextTop.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
-//                seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+                seekBarTextTop.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
                 seekBarTextBottom.setProgress(progress);
                 seekBarTextBottom.setThumb(getTextsThumb(String.format(Locale.ENGLISH, "%s %d %s", textBeforeProgress, progress, textAfterProgress)));
-//                seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
+                seekBarTextBottom.getThumb().setColorFilter(new PorterDuffColorFilter(thumbColor, PorterDuff.Mode.SRC_IN));
             }
 
             @Override
